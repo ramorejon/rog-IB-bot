@@ -126,7 +126,7 @@ def send_code_block(data):
 
     logging.info({"content": message})
 
-    response = discord_post(DISCORD_WEBHOOK, json={"content": message})
+    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     if response.status_code == 204:
         logging.info("Message sent successfully!", flush=True)
         logging.info("Message sent successfully!")
@@ -149,7 +149,7 @@ def send_embed(data):
             "inline": True
         })
 
-    response = discord_post(DISCORD_WEBHOOK, json={"embeds": [embed]})
+    response = requests.post(DISCORD_WEBHOOK, json={"embeds": [embed]})
     
     if response.status_code == 204:
         logging.info("Message sent successfully!", flush=True)
