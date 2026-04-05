@@ -50,8 +50,8 @@ def send():
 
     message = "\n".join(lines)
 
-    requests.post(DISCORD_WEBHOOK, json={"content": message})
+    requests.post(DISCORD_WEBHOOK, json={"content": '"' + message + '"'})
 
     store.clear()
 
-    return {"status": "sent", "count": len(sorted_items)}
+    return {"status": "sent", "count": len(sorted_items), "msg": message}
