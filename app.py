@@ -117,12 +117,14 @@ def send_code_block(data):
 
     message = "\n".join(lines)
 
+    logging.info({"content": message})
+
     response = discord_post(DISCORD_WEBHOOK, json={"content": message})
     if response.status_code == 204:
-        print("Message sent successfully!", flush=True)
+        logging.info("Message sent successfully!", flush=True)
         logging.info("Message sent successfully!")
     else:
-        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
 
@@ -143,10 +145,10 @@ def send_embed(data):
     response = discord_post(DISCORD_WEBHOOK, json={"embeds": [embed]})
     
     if response.status_code == 204:
-        print("Message sent successfully!", flush=True)
+        logging.info("Message sent successfully!", flush=True)
         logging.info("Message sent successfully!")
     else:
-        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
 
