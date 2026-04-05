@@ -35,8 +35,8 @@ def webhook():
 
     return {"status": "received", "ticker": ticker}
 
-@app.route("/sendX", methods=["GET"])
-def sendX():
+@app.route("/send", methods=["GET"])
+def send():
     if not store:
         return {"status": "no data"}
 
@@ -65,6 +65,11 @@ def sendX():
     else:
         print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
+        if response.status_code == 429:
+            logging.info({
+                "remaining": response.headers.get("X-RateLimit-Remaining"),
+                "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+            })
 
     store.clear()
 
@@ -73,8 +78,8 @@ def sendX():
 
 
 
-@app.route("/send", methods=["GET"])
-def send():
+@app.route("/sendX", methods=["GET"])
+def sendX():
 
     today = datetime.utcnow().date()
 
