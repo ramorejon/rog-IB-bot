@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 import requests
 import os
 from datetime import datetime
+import logging
+import sys
 
 app = Flask(__name__)
 
@@ -53,10 +55,15 @@ def send():
     requests.post(DISCORD_WEBHOOK, json={"content": message})
     response = requests.post(DISCORD_WEBHOOK, json={"content": "test message"})
 
+    #logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
+    #logging.info("hello world")
+
     if response.status_code == 204:
         print("Message sent successfully!", flush=True)
+        logging.info("Message sent successfully!")
     else:
         print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
     store.clear()
 
