@@ -59,6 +59,9 @@ def send():
     if OUTPUT_FORMAT =="code" or True:
         codeResponse = send_code_block(sorted_items)
         return codeResponse
+    if OUTPUT_FORMAT == "image" and False:
+        imageResponse = send_image(sorted_items)
+        return imageResponse
     
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
@@ -120,11 +123,11 @@ def send_code_block(data):
     lines = []
     lines.append("📊 Inside Bars – Daily\n")
     lines.append("```")
-    lines.append(f"{'Ticker':<8} {'Count':>5}")
-    lines.append(f"{'-'*8} {'-'*5}")
+    lines.append(f"{'Symbol':<9} {'xIB':>5}")
+    lines.append(f"{'-'*9} {'-'*5}")
 
     for ticker, d in data:
-        lines.append(f"{ticker:<8} {d['count']:>5}")
+        lines.append(f"{ticker:<9} {d['count']:>5}")
 
     lines.append("```")
 
@@ -134,10 +137,8 @@ def send_code_block(data):
 
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     if response.status_code == 204:
-        logging.info("Message sent successfully!", flush=True)
         logging.info("Message sent successfully!")
     else:
-        logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
     return {"content": message}
@@ -175,7 +176,7 @@ def send_image(data):
     fig, ax = plt.subplots()
     ax.axis('off')
 
-    table_data = [["Ticker", "Count"]]
+    table_data = [["Symbol", "xIB"]]
     for ticker, d in data:
         table_data.append([ticker, d["count"]])
 
@@ -187,7 +188,10 @@ def send_image(data):
     plt.close()
 
     with open("table.png", "rb") as f:
-        discord_post(DISCORD_WEBHOOK, files={"file": f})
+        requests.post(DISCORD_WEBHOOK, files={"file": f})
+
+    return {"file": f}
+
 
 import time
 import requests
