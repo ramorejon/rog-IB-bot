@@ -183,6 +183,32 @@ def safe_json(response):
 
 def discord_post(url, json=None, files=None, max_retries=5):
     for attempt in range(max_retries):
+        try:
+            response = requests.post(url, json=json, files=files, timeout=10)
+        except requests.exceptions.RequestException as e:
+            logging.info(f"[NETWORK ERROR] {e}")
+            time.sleep(1)
+            continue
+
+        if response.status_code in (200, 204):
+            return response
+
+        data = safe_json(response)
+
+        if response.status_code == 429:
+            retry_after = data.get("retry_after") or response.headers.get("X-RateLimit-Reset-After", 1)
+            time.sleep(float(retry_after))
+            continue
+
+        logging.info(f"[ERROR] {response.status_code}: {response.text}")
+        return response
+
+    raise RuntimeError("Discord request failed after retries")
+
+
+
+def discord_postX(url, json=None, files=None, max_retries=5):
+    for attempt in range(max_retries):
         response = requests.post(url, json=json, files=files)
 
 
