@@ -51,7 +51,12 @@ def send():
     message = "\n".join(lines)
 
     requests.post(DISCORD_WEBHOOK, json={"content": message})
-    requests.post(DISCORD_WEBHOOK, json={"content": "test message"})
+    response = requests.post(DISCORD_WEBHOOK, json={"content": "test message"})
+
+    if response.status_code == 204:
+        print("Message sent successfully!", flush=True)
+    else:
+        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
 
     store.clear()
 
