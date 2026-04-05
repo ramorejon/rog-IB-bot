@@ -194,6 +194,13 @@ def discord_post(url, json=None, files=None, max_retries=5):
             return response
 
         data = safe_json(response)
+        
+        logging.info("data:"+data)
+        
+        logging.info({
+            "remaining": response.headers.get("X-RateLimit-Remaining"),
+            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+        })
 
         if response.status_code == 429:
             retry_after = data.get("retry_after") or response.headers.get("X-RateLimit-Reset-After", 1)
