@@ -51,6 +51,7 @@ def send():
     message = "\n".join(lines)
 
     requests.post(DISCORD_WEBHOOK, json={"content": '"' + message + '"'})
+    requests.post(DISCORD_WEBHOOK, json={"content": "test message"})
 
     store.clear()
 
