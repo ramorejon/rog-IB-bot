@@ -53,10 +53,13 @@ def send():
 
     message = "\n".join(lines)
 
-    if OUTPUT_FORMAT == "embed" or True:
+    if OUTPUT_FORMAT == "embed" and False:
         embedResponse = send_embed(sorted_items)
         return embedResponse
-
+    if OUTPUT_FORMAT =="code" or True:
+        codeResponse = send_code_block(sorted_items)
+        return codeResponse
+    
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
 
@@ -137,6 +140,7 @@ def send_code_block(data):
         logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
+    return {"content": message}
 
 def send_embed(data):
     embed = {
