@@ -53,33 +53,35 @@ def send():
 
     message = "\n".join(lines)
 
-    if OUTPUT_FORMAT == "embed" and False:
-        embedResponse = send_embed(sorted_items)
-        return embedResponse
-    if OUTPUT_FORMAT =="code" and False:
-        codeResponse = send_code_block(sorted_items)
-        return codeResponse
-    if OUTPUT_FORMAT == "image" or True:
-        imageResponse = send_image(sorted_items)
-        return imageResponse
+    sendResponse = {"content": ""}
+
+    if OUTPUT_FORMAT == "embed":
+        sendResponse = send_embed(sorted_items)
+    if OUTPUT_FORMAT =="code":
+        sendResponse = send_code_block(sorted_items)
+    if OUTPUT_FORMAT == "image":
+        sendResponse = send_image(sorted_items)
+
     
-    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+    return sendResponse
+    
+    #response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
 
     #logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
     #logging.info("hello world")
 
-    if response.status_code == 204:
-        print("Message sent successfully!", flush=True)
-        logging.info("Message sent successfully!")
-    else:
-        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
-        logging.info(f"Failed to send: {response.status_code} - {response.text}")
-        if response.status_code == 429:
-            logging.info({
-                "remaining": response.headers.get("X-RateLimit-Remaining"),
-                "reset_after": response.headers.get("X-RateLimit-Reset-After"),
-            })
+    #if response.status_code == 204:
+    #    print("Message sent successfully!", flush=True)
+    #    logging.info("Message sent successfully!")
+    #else:
+    #    print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+    #    logging.info(f"Failed to send: {response.status_code} - {response.text}")
+    #    if response.status_code == 429:
+    #        logging.info({
+    #            "remaining": response.headers.get("X-RateLimit-Remaining"),
+    #            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+    #        })
 
     store.clear()
 
@@ -87,32 +89,6 @@ def send():
 #    return {"content": message}
 #    return {"status": "sent", "count": len(sorted_items), "msg": message}
 
-
-
-@app.route("/sendX", methods=["GET"])
-def sendX():
-
-    today = datetime.utcnow().date()
-
-    #if last_sent_date == today:
-     #   return {"status": "already sent today"}
-
-    
-    if not store:
-        return {"status": "no data"}
-
-    sorted_items = sorted(store.items(), key=lambda x: x[1]["count"], reverse=True)
-
-    if OUTPUT_FORMAT == "embed":
-        send_embed(sorted_items)
-    elif OUTPUT_FORMAT == "image":
-        send_image(sorted_items)
-    else:
-        send_code_block(sorted_items)
-
-    store.clear()
-
-    return {"status": "sent", "count": len(sorted_items)}
 
 
 # ---------------------------
@@ -136,12 +112,34 @@ def send_code_block(data):
     logging.info({"content": message})
 
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+
+
+    #if response.status_code == 204:
+    #    print("Message sent successfully!", flush=True)
+    #    logging.info("Message sent successfully!")
+    #else:
+    #    print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+    #    logging.info(f"Failed to send: {response.status_code} - {response.text}")
+    #    if response.status_code == 429:
+    #        logging.info({
+    #            "remaining": response.headers.get("X-RateLimit-Remaining"),
+    #            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+    #        })
+
+    success = False
     if response.status_code == 204:
         logging.info("Message sent successfully!")
+        success = True
     else:
+        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
+        if response.status_code == 429:
+            logging.info({
+                "remaining": response.headers.get("X-RateLimit-Remaining"),
+                "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+            })
 
-    return {"content": message}
+    return {"content": message, "success":  success}
 
 def send_embed(data):
     embed = {
