@@ -45,11 +45,11 @@ def sendX():
 
     lines = []
     lines.append("📊 Inside Bars – Daily\n")
-    lines.append("Ticker | Count")
-    lines.append("------ | -----")
+    lines.append("Ticker * Count")
+    lines.append("------ * -----")
 
     for ticker, data in sorted_items:
-        lines.append(f"{ticker} | {data['count']}")
+        lines.append(f"{ticker} * {data['count']}")
 
     message = "\n".join(lines)
 
