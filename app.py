@@ -157,7 +157,7 @@ def send_embed(data):
     else:
         logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
-         logging.info({"embeds": [embed]})
+        logging.info({"embeds": [embed]})
 
     return {"embeds": [embed]}
 
