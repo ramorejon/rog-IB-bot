@@ -195,7 +195,7 @@ def discord_post(url, json=None, files=None, max_retries=5):
 
         data = safe_json(response)
         
-        logging.info("data:"+data)
+        logging.info(data)
         
         logging.info({
             "remaining": response.headers.get("X-RateLimit-Remaining"),
