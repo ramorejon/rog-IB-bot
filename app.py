@@ -53,6 +53,8 @@ def send():
 
     message = "\n".join(lines)
 
+    send_embed(sorted_items)
+
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
 
@@ -155,6 +157,9 @@ def send_embed(data):
     else:
         logging.info(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
+         logging.info({"embeds": [embed]})
+
+    return {"embeds": [embed]}
 
 
 def send_image(data):
