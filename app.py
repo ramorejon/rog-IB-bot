@@ -53,7 +53,9 @@ def send():
 
     message = "\n".join(lines)
 
-    send_embed(sorted_items)
+    if OUTPUT_FORMAT == "embed" or True:
+        embedResponse = send_embed(sorted_items)
+        return embedResponse
 
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
@@ -75,7 +77,8 @@ def send():
 
     store.clear()
 
-    return {"content": message}
+    return embedResponse
+#    return {"content": message}
 #    return {"status": "sent", "count": len(sorted_items), "msg": message}
 
 
