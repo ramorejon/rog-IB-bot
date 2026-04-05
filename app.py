@@ -110,7 +110,13 @@ def send_code_block(data):
 
     message = "\n".join(lines)
 
-    requests.post(DISCORD_WEBHOOK, json={"content": message})
+    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+    if response.status_code == 204:
+        print("Message sent successfully!", flush=True)
+        logging.info("Message sent successfully!")
+    else:
+        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
 
 def send_embed(data):
@@ -127,7 +133,14 @@ def send_embed(data):
             "inline": True
         })
 
-    requests.post(DISCORD_WEBHOOK, json={"embeds": [embed]})
+    response = requests.post(DISCORD_WEBHOOK, json={"embeds": [embed]})
+    
+    if response.status_code == 204:
+        print("Message sent successfully!", flush=True)
+        logging.info("Message sent successfully!")
+    else:
+        print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send: {response.status_code} - {response.text}")
 
 
 def send_image(data):
