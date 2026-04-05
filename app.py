@@ -56,10 +56,10 @@ def send():
     if OUTPUT_FORMAT == "embed" and False:
         embedResponse = send_embed(sorted_items)
         return embedResponse
-    if OUTPUT_FORMAT =="code" or True:
+    if OUTPUT_FORMAT =="code" and False:
         codeResponse = send_code_block(sorted_items)
         return codeResponse
-    if OUTPUT_FORMAT == "image" and False:
+    if OUTPUT_FORMAT == "image" or True:
         imageResponse = send_image(sorted_items)
         return imageResponse
     
