@@ -36,7 +36,7 @@ def webhook():
     return {"status": "received", "ticker": ticker}
 
 @app.route("/sendX", methods=["GET"])
-def send():
+def sendX():
     if not store:
         return {"status": "no data"}
 
