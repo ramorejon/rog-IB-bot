@@ -54,7 +54,7 @@ def send():
     message = "\n".join(lines)
 
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
-    //response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
+    #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
 
     #logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
     #logging.info("hello world")
