@@ -55,4 +55,5 @@ def send():
 
     store.clear()
 
-    return {"status": "sent", "count": len(sorted_items), "msg": message}
+    return {"content": '"' + message + '"'}
+#    return {"status": "sent", "count": len(sorted_items), "msg": message}
