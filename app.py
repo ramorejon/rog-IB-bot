@@ -170,39 +170,54 @@ def send_image(data):
     with open("table.png", "rb") as f:
         discord_post(DISCORD_WEBHOOK, files={"file": f})
 
-
 import time
 import requests
+
+
+def safe_json(response):
+    try:
+        return response.json()
+    except Exception:
+        return {}
 
 
 def discord_post(url, json=None, files=None, max_retries=5):
     for attempt in range(max_retries):
         response = requests.post(url, json=json, files=files)
 
+
         logging.info({
             "remaining": response.headers.get("X-RateLimit-Remaining"),
             "reset_after": response.headers.get("X-RateLimit-Reset-After"),
         })
         
-        # Success
+        
+        # Success (Discord often returns 204 with empty body)
         if response.status_code in (200, 204):
             return response
 
+        # Try to parse JSON safely
+        data = safe_json(response)
+
         # Rate limited
         if response.status_code == 429:
-            retry_after = response.json().get("retry_after", 1)
+            retry_after = data.get("retry_after")
 
-            logging.info(f"[RATE LIMIT] Retry after {retry_after}s")
-            time.sleep(retry_after)
+            if retry_after is None:
+                retry_after = float(response.headers.get("X-RateLimit-Reset-After", 1))
+
+            logging.info(f"[RATE LIMIT] Sleeping {retry_after}s")
+            time.sleep(float(retry_after))
             continue
 
-        # Near limit (proactive throttle)
-        remaining = int(response.headers.get("X-RateLimit-Remaining", 1))
-        reset_after = float(response.headers.get("X-RateLimit-Reset-After", 0))
+        # Proactive throttle
+        remaining = response.headers.get("X-RateLimit-Remaining")
+        reset_after = response.headers.get("X-RateLimit-Reset-After")
 
-        if remaining == 0:
-            logging.info(f"[THROTTLE] Sleeping {reset_after}s")
-            time.sleep(reset_after)
+        if remaining is not None and int(remaining) == 0:
+            wait = float(reset_after or 1)
+            logging.info(f"[THROTTLE] Sleeping {wait}s")
+            time.sleep(wait)
 
         # Other errors
         if response.status_code >= 400:
@@ -210,6 +225,3 @@ def discord_post(url, json=None, files=None, max_retries=5):
             return response
 
     return None
-
-
-
