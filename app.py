@@ -53,8 +53,8 @@ def sendX():
 
     message = "\n".join(lines)
 
-    requests.post(DISCORD_WEBHOOK, json={"content": message})
-    response = requests.post(DISCORD_WEBHOOK, json={"content": "test message"})
+    discord_post(DISCORD_WEBHOOK, json={"content": message})
+    response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
 
     #logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
     #logging.info("hello world")
@@ -75,6 +75,13 @@ def sendX():
 
 @app.route("/send", methods=["GET"])
 def send():
+
+    today = datetime.utcnow().date()
+
+    #if last_sent_date == today:
+     #   return {"status": "already sent today"}
+
+    
     if not store:
         return {"status": "no data"}
 
@@ -110,7 +117,7 @@ def send_code_block(data):
 
     message = "\n".join(lines)
 
-    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+    response = discord_post(DISCORD_WEBHOOK, json={"content": message})
     if response.status_code == 204:
         print("Message sent successfully!", flush=True)
         logging.info("Message sent successfully!")
@@ -133,7 +140,7 @@ def send_embed(data):
             "inline": True
         })
 
-    response = requests.post(DISCORD_WEBHOOK, json={"embeds": [embed]})
+    response = discord_post(DISCORD_WEBHOOK, json={"embeds": [embed]})
     
     if response.status_code == 204:
         print("Message sent successfully!", flush=True)
@@ -161,10 +168,48 @@ def send_image(data):
     plt.close()
 
     with open("table.png", "rb") as f:
-        requests.post(DISCORD_WEBHOOK, files={"file": f})
+        discord_post(DISCORD_WEBHOOK, files={"file": f})
 
 
+import time
+import requests
 
+
+def discord_post(url, json=None, files=None, max_retries=5):
+    for attempt in range(max_retries):
+        response = requests.post(url, json=json, files=files)
+
+        logging.info({
+            "remaining": response.headers.get("X-RateLimit-Remaining"),
+            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+        })
+        
+        # Success
+        if response.status_code in (200, 204):
+            return response
+
+        # Rate limited
+        if response.status_code == 429:
+            retry_after = response.json().get("retry_after", 1)
+
+            logging.info(f"[RATE LIMIT] Retry after {retry_after}s")
+            time.sleep(retry_after)
+            continue
+
+        # Near limit (proactive throttle)
+        remaining = int(response.headers.get("X-RateLimit-Remaining", 1))
+        reset_after = float(response.headers.get("X-RateLimit-Reset-After", 0))
+
+        if remaining == 0:
+            logging.info(f"[THROTTLE] Sleeping {reset_after}s")
+            time.sleep(reset_after)
+
+        # Other errors
+        if response.status_code >= 400:
+            logging.info(f"[ERROR] {response.status_code}: {response.text}")
+            return response
+
+    return None
 
 
 
