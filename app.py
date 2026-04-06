@@ -12,6 +12,7 @@ store = {}
 
 DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 OUTPUT_FORMAT = os.environ.get("OUTPUT_FORMAT", "code")  # code | embed | image
+SORT_MODE = os.environ.get("SORT_MODE", "count_alpha") # count_alpha
 
 @app.route("/")
 def home():
@@ -41,8 +42,9 @@ def send():
         return {"status": "no data"}
 
     # sort by count descending
-    sorted_items = sorted(store.items(), key=lambda x: x[1]["count"], reverse=True)
-
+    #sorted_items = sorted(store.items(), key=lambda x: x[1]["count"], reverse=True)
+    sorted_items = sort_data(store)
+    
     lines = []
     lines.append("📊 Inside Bars – Daily\n")
     lines.append("Ticker * Count")
@@ -248,49 +250,23 @@ def discord_post(url, json=None, files=None, max_retries=5):
 
     raise RuntimeError("Discord request failed after retries")
 
+def sort_data(store):
+    items = list(store.items())
+
+    if SORT_MODE == "count_volume_alpha":
+        return sorted(
+            items,
+            key=lambda x: (
+                -x[1]["count"],
+                -x[1].get("volume", 0),
+                x[0]
+            )
+        )
+
+    # default: count + alphabetical
+    return sorted(
+        items,
+        key=lambda x: (-x[1]["count"], x[0])
+    )
 
 
-def discord_postX(url, json=None, files=None, max_retries=5):
-    for attempt in range(max_retries):
-        response = requests.post(url, json=json, files=files)
-
-
-        logging.info({
-            "remaining": response.headers.get("X-RateLimit-Remaining"),
-            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
-        })
-        
-        
-        # Success (Discord often returns 204 with empty body)
-        if response.status_code in (200, 204):
-            return response
-
-        # Try to parse JSON safely
-        data = safe_json(response)
-
-        # Rate limited
-        if response.status_code == 429:
-            retry_after = data.get("retry_after")
-
-            if retry_after is None:
-                retry_after = float(response.headers.get("X-RateLimit-Reset-After", 1))
-
-            logging.info(f"[RATE LIMIT] Sleeping {retry_after}s")
-            time.sleep(float(retry_after))
-            continue
-
-        # Proactive throttle
-        remaining = response.headers.get("X-RateLimit-Remaining")
-        reset_after = response.headers.get("X-RateLimit-Reset-After")
-
-        if remaining is not None and int(remaining) == 0:
-            wait = float(reset_after or 1)
-            logging.info(f"[THROTTLE] Sleeping {wait}s")
-            time.sleep(wait)
-
-        # Other errors
-        if response.status_code >= 400:
-            logging.info(f"[ERROR] {response.status_code}: {response.text}")
-            return response
-
-    return None
