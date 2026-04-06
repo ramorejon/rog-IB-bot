@@ -64,33 +64,62 @@ def send():
     if OUTPUT_FORMAT == "image":
         sendResponse = send_image(sorted_items)
 
-    
     return sendResponse
     
-    #response = requests.post(DISCORD_WEBHOOK, json={"content": message})
-    #response = discord_post(DISCORD_WEBHOOK, json={"content": "test message"})
-
-    #logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
-    #logging.info("hello world")
-
-    #if response.status_code == 204:
-    #    print("Message sent successfully!", flush=True)
-    #    logging.info("Message sent successfully!")
-    #else:
-    #    print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
-    #    logging.info(f"Failed to send: {response.status_code} - {response.text}")
-    #    if response.status_code == 429:
-    #        logging.info({
-    #            "remaining": response.headers.get("X-RateLimit-Remaining"),
-    #            "reset_after": response.headers.get("X-RateLimit-Reset-After"),
-    #        })
-
     store.clear()
 
-    return embedResponse
 #    return {"content": message}
 #    return {"status": "sent", "count": len(sorted_items), "msg": message}
 
+
+
+@app.route("/sendtest", methods=["GET"])
+def sendtest():
+
+    # store latest signal
+    store["AAPL"] = {
+        "count": 4,
+        "time": datetime.utcnow()
+    }
+    store["QCOM"] = {
+        "count": 3,
+        "time": datetime.utcnow()
+    }
+    store["NVDA"] = {
+        "count": 1,
+        "time": datetime.utcnow()
+    }
+    store["AMD"] = {
+        "count": 1,
+        "time": datetime.utcnow()
+    }
+
+    
+    # sort by count descending
+    sorted_items = sort_data(store)
+    
+    lines = []
+    lines.append("📊 Inside Bars – Daily\n")
+    lines.append("Ticker * Count")
+    lines.append("------ * -----")
+
+    for ticker, data in sorted_items:
+        lines.append(f"{ticker} * {data['count']}")
+
+    message = "\n".join(lines)
+
+    sendResponse = {"content": ""}
+
+    if OUTPUT_FORMAT == "embed":
+        sendResponse = send_embed(sorted_items)
+    if OUTPUT_FORMAT =="code":
+        sendResponse = send_code_block(sorted_items)
+    if OUTPUT_FORMAT == "image":
+        sendResponse = send_image(sorted_items)
+    
+    return sendResponse
+
+    store.clear()
 
 
 # ---------------------------
@@ -176,6 +205,61 @@ def send_embed(data):
 def send_image(data):
     import matplotlib.pyplot as plt
 
+    # Prepare data
+    table_data = [["Ticker", "Count"]]
+    for ticker, d in data:
+        table_data.append([ticker, d["count"]])
+
+    rows = len(table_data)
+
+    # Dynamic sizing (tight)
+    fig_height = max(1, rows * 0.35)
+    fig, ax = plt.subplots(figsize=(3, fig_height))  # narrow width
+    ax.axis('off')
+
+    # Create table with controlled column widths
+    table = ax.table(
+        cellText=table_data,
+        loc='center',
+        colWidths=[0.6, 0.4]  # tighter columns
+    )
+
+    # Styling
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+
+    # Reduce padding / spacing
+    table.scale(1, 1.2)
+
+    # Header styling
+    for (row, col), cell in table.get_celld().items():
+        if row == 0:
+            cell.set_text_props(weight='bold')
+            cell.set_height(0.08)
+        else:
+            cell.set_height(0.06)
+
+    # row striping
+    for (row, col), cell in table.get_celld().items():
+    if row > 0 and row % 2 == 0:
+        cell.set_facecolor("#f2f2f2")
+    
+    # Tight layout (critical)
+    plt.tight_layout(pad=0.2)
+
+    # Save tightly cropped
+    plt.savefig("table.png", bbox_inches='tight', dpi=200)
+    plt.close()
+
+    with open("table.png", "rb") as f:
+        requests.post(DISCORD_WEBHOOK, files={"file": f})
+
+
+
+
+def send_imageX(data):
+    import matplotlib.pyplot as plt
+
     fig, ax = plt.subplots()
     ax.axis('off')
 
@@ -185,7 +269,7 @@ def send_image(data):
 
     table = ax.table(cellText=table_data, loc='center')
     table.auto_set_font_size(False)
-    table.set_fontsize(10)
+    table.set_fontsize(10)        
 
     plt.savefig("table.png", bbox_inches='tight')
     plt.close()
