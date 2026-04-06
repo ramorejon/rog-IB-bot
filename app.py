@@ -241,8 +241,8 @@ def send_image(data):
 
     # row striping
     for (row, col), cell in table.get_celld().items():
-    if row > 0 and row % 2 == 0:
-        cell.set_facecolor("#f2f2f2")
+        if row > 0 and row % 2 == 0:
+            cell.set_facecolor("#f2f2f2")
     
     # Tight layout (critical)
     plt.tight_layout(pad=0.2)
