@@ -111,7 +111,10 @@ def send_code_block(data):
 
     logging.info({"content": message})
 
-    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+    response = {}
+    for chunk in chunk_message(message):
+        #discord_post(DISCORD_WEBHOOK, json={"content": chunk})
+        response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
 
 
     #if response.status_code == 204:
@@ -189,6 +192,18 @@ def send_image(data):
         requests.post(DISCORD_WEBHOOK, files={"file": f})
 
     return {"file": f}
+
+
+def chunk_message(text, limit=2000):
+    chunks = []
+    while len(text) > limit:
+        split_at = text.rfind("\n", 0, limit)
+        if split_at == -1:
+            split_at = limit
+        chunks.append(text[:split_at])
+        text = text[split_at:]
+    chunks.append(text)
+    return chunks
 
 
 import time
