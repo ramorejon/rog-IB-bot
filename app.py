@@ -168,7 +168,7 @@ def send_code_block(data):
         print(f"Failed to send: {response.status_code} - {response.text}", flush=True)
         logging.info(f"Failed to send: {response.status_code} - {response.text}")
         if response.status_code == 429:
-        print(f"Remaining:{response.headers.get("X-RateLimit-Remaining")} \nReset_after: {response.headers.get("X-RateLimit-Reset-After")}", flush=True)
+            print(f"Remaining:{response.headers.get("X-RateLimit-Remaining")} \nReset_after: {response.headers.get("X-RateLimit-Reset-After")}", flush=True)
             logging.info({
                 "remaining": response.headers.get("X-RateLimit-Remaining"),
                 "reset_after": response.headers.get("X-RateLimit-Reset-After"),
