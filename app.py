@@ -127,7 +127,7 @@ def sendtest():
 # ---------------------------
 # FORMATTERS
 # ---------------------------
-def send_code_block(data:
+def send_code_block(data):
     lines = []
     lines.append("Ticker   Count")
     lines.append("-------- -----")
