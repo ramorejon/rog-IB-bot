@@ -138,9 +138,9 @@ def send_code_block(data):
     logging.info({"content": message})
 
     response = {}
-    for chunk in chunk_message(message,40):
+    for chunk in chunk_message(message,1000):
         discord_post(DISCORD_WEBHOOK, json={"content": chunk})
-        response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
+        #response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
         time.sleep(2) 
     #for chunk in chunk_message(message, 40):
         #print(f"Chunk:{chunk}", flush=True)
