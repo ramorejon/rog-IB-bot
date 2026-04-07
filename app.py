@@ -41,6 +41,7 @@ def webhook():
 
 @app.route("/send", methods=["GET"])
 def send():
+    global SEND_COUNT  # Tells Python to use the global variable
     if not store:
         return {"status": "no data"}
 
@@ -70,6 +71,7 @@ def send():
 
 @app.route("/sendtest", methods=["GET"])
 def sendtest():
+    global SEND_COUNT  # Tells Python to use the global variable
 
     SEND_COUNT +=1
     # store latest signal
@@ -113,6 +115,7 @@ def sendtest():
 # ---------------------------
 
 def send_code_block(data):
+    global SEND_COUNT  # Tells Python to use the global variable
     lines = []
     lines.append("📊 Inside Bars – Daily\n")
     lines.append("```")
