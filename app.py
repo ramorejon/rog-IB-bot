@@ -14,6 +14,9 @@ DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 OUTPUT_FORMAT = os.environ.get("OUTPUT_FORMAT", "code")  # code | embed | image
 SORT_MODE = os.environ.get("SORT_MODE", "count_alpha") # count_alpha
 
+SEND_COUNT = 0
+
+
 @app.route("/")
 def home():
     return {"status": "running"}
@@ -41,20 +44,12 @@ def send():
     if not store:
         return {"status": "no data"}
 
+    SEND_COUNT +=1
     # sort by count descending
     #sorted_items = sorted(store.items(), key=lambda x: x[1]["count"], reverse=True)
     sorted_items = sort_data(store)
+
     
-    lines = []
-    lines.append("📊 Inside Bars – Daily\n")
-    lines.append("Ticker * Count")
-    lines.append("------ * -----")
-
-    for ticker, data in sorted_items:
-        lines.append(f"{ticker} * {data['count']}")
-
-    message = "\n".join(lines)
-
     sendResponse = {"content": ""}
 
     if OUTPUT_FORMAT == "embed":
@@ -76,6 +71,7 @@ def send():
 @app.route("/sendtest", methods=["GET"])
 def sendtest():
 
+    SEND_COUNT +=1
     # store latest signal
     store["AAPL"] = {
         "count": 4,
@@ -98,16 +94,6 @@ def sendtest():
     # sort by count descending
     sorted_items = sort_data(store)
     
-    lines = []
-    lines.append("📊 Inside Bars – Daily\n")
-    lines.append("Ticker * Count")
-    lines.append("------ * -----")
-
-    for ticker, data in sorted_items:
-        lines.append(f"{ticker} * {data['count']}")
-
-    message = "\n".join(lines)
-
     sendResponse = {"content": ""}
 
     if OUTPUT_FORMAT == "embed":
@@ -148,6 +134,7 @@ def send_code_block(data):
         #response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
     #for chunk in chunk_message(message, 40):
         #print(f"Chunk:{chunk}", flush=True)
+    print(f"SENDCOUNT:{SEND_COUNT}", flush=True)
 
     response = requests.post(DISCORD_WEBHOOK, json={"content": message})
     
