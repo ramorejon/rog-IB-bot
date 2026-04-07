@@ -127,8 +127,44 @@ def sendtest():
 # ---------------------------
 # FORMATTERS
 # ---------------------------
+def send_code_block(data:
+    lines = []
+    lines.append("Ticker   Count")
+    lines.append("-------- -----")
 
-def send_code_block(data):
+    for ticker, d in data:
+        lines.append(f"{ticker:<9} {d['count']:>5}")
+
+    chunks = chunk_code_block_lines(lines)
+    #for chunk in chunks:
+        #message = "📊 Inside Bars – Daily\n\n```" + "\n".join(chunk) + "```"
+        #discord_post(DISCORD_WEBHOOK, json={"content": message})
+
+    for i, chunk in enumerate(chunks):
+        header = "📊 Inside Bars – Daily\n\n" if i == 0 else ""
+        message = header + "```" + "\n".join(chunk) + "```"
+        response = discord_post(DISCORD_WEBHOOK, json={"content": message})
+        time.sleep(2) 
+        
+    success = False
+    if response.status_code == 204:
+        logging.info("Message sent successfully!")
+        success = True
+    else:
+        print(f"Failed to send P: {response.status_code} - {response.text}", flush=True)
+        logging.info(f"Failed to send L: {response.status_code} - {response.text} ", flush=True)
+        if response.status_code == 429:
+            print(f"Remaining:{response.headers.get("X-RateLimit-Remaining")} \nReset_after: {response.headers.get("X-RateLimit-Reset-After")}", flush=True)
+            logging.info({
+                "remaining": response.headers.get("X-RateLimit-Remaining"),
+                "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+            })
+    message = "\n".join(lines)
+    return {"content": message, "success":  success}
+
+
+                    
+def send_code_blockXXX(data):
     global SEND_COUNT  # Tells Python to use the global variable
     lines = []
     lines.append("📊 Inside Bars – Daily\n")
@@ -288,6 +324,28 @@ def send_imageX(data):
         requests.post(DISCORD_WEBHOOK, files={"file": f})
 
     return {"file": f}
+
+
+def chunk_code_block_lines(lines, max_chars=1900):
+    chunks = []
+    current_chunk = []
+    current_len = 0
+
+    for line in lines:
+        line_len = len(line) + 1  # newline
+
+        if current_len + line_len > max_chars:
+            chunks.append(current_chunk)
+            current_chunk = []
+            current_len = 0
+
+        current_chunk.append(line)
+        current_len += line_len
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
 
 
 def chunk_message(text, limit=2000):
