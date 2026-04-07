@@ -5,6 +5,11 @@ from datetime import datetime
 import logging
 import sys
 
+import time
+import requests
+
+
+
 app = Flask(__name__)
 
 # In-memory store: { ticker: {count, timestamp} }
@@ -19,7 +24,8 @@ SEND_COUNT = 0
 
 @app.route("/")
 def home():
-    return {"status": "running"}
+    global SEND_COUNT  # Tells Python to use the global variable
+    return {"status": "running", "sendcount": SEND_COUNT}
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -287,9 +293,6 @@ def chunk_message(text, limit=2000):
     chunks.append(text)
     return chunks
 
-
-import time
-import requests
 
 
 def safe_json(response):
