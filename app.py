@@ -143,10 +143,12 @@ def send_code_block(data):
     logging.info({"content": message})
 
     response = {}
-    for chunk in chunk_message(message):
+    #for chunk in chunk_message(message):
         #discord_post(DISCORD_WEBHOOK, json={"content": chunk})
-        response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
+        #response = requests.post(DISCORD_WEBHOOK, json={"content": chunk})
 
+    response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+    
 
     #if response.status_code == 204:
     #    print("Message sent successfully!", flush=True)
