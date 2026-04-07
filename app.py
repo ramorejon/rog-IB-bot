@@ -18,6 +18,7 @@ store = {}
 DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 OUTPUT_FORMAT = os.environ.get("OUTPUT_FORMAT", "code")  # code | embed | image
 SORT_MODE = os.environ.get("SORT_MODE", "count_alpha") # count_alpha
+SEND_SECRET = os.environ.get("SEND_SECRET")
 
 SEND_COUNT = 0
 
@@ -48,6 +49,10 @@ def webhook():
 @app.route("/send", methods=["GET"])
 def send():
     global SEND_COUNT  # Tells Python to use the global variable
+    secret = request.args.get("key")
+    if secret != SEND_SECRET:
+        return {"error": "unauthorized"}, 403
+    
     if not store:
         return {"status": "no data"}
 
@@ -78,6 +83,9 @@ def send():
 @app.route("/sendtest", methods=["GET"])
 def sendtest():
     global SEND_COUNT  # Tells Python to use the global variable
+    secret = request.args.get("key")
+    if secret != SEND_SECRET:
+        return {"error": "unauthorized"}, 403
 
     SEND_COUNT +=1
     # store latest signal
