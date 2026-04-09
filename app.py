@@ -115,7 +115,7 @@ def sendtest():
     if OUTPUT_FORMAT == "embed":
         sendResponse = send_embed(sorted_items)
     if OUTPUT_FORMAT =="code":
-        sendResponse = send_code_block(sorted_items)
+        sendResponse = send_code_blockXXX(sorted_items)
     if OUTPUT_FORMAT == "image":
         sendResponse = send_image(sorted_items)
     
