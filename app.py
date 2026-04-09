@@ -115,7 +115,7 @@ def sendtest():
     if OUTPUT_FORMAT == "embed":
         sendResponse = send_embed(sorted_items)
     if OUTPUT_FORMAT =="code":
-        sendResponse = send_code_blockXXX(sorted_items)
+        sendResponse = send_code_block(sorted_items)
     if OUTPUT_FORMAT == "image":
         sendResponse = send_image(sorted_items)
     
@@ -143,7 +143,8 @@ def send_code_block(data):
     for i, chunk in enumerate(chunks):
         header = "📊 Inside Bars – Daily\n\n" if i == 0 else ""
         message = header + "```" + "\n".join(chunk) + "```"
-        response = discord_post(DISCORD_WEBHOOK, json={"content": message})
+        #response = discord_post(DISCORD_WEBHOOK, json={"content": message})
+        response = requests.post(DISCORD_WEBHOOK, json={"content": message})
         time.sleep(2) 
         
     success = False
