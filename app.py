@@ -129,8 +129,9 @@ def sendtest():
 # ---------------------------
 def send_code_block(data):
     lines = []
-    lines.append("Ticker   Count")
-    lines.append("-------- -----")
+    #lines.append("Ticker   Count")
+    lines.append(f"{'Symbol':<9} {'xIB':>5}")
+    lines.append("--------- -----")
 
     for ticker, d in data:
         lines.append(f"{ticker:<9} {d['count']:>5}")
