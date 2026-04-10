@@ -149,20 +149,21 @@ def send_code_block(data):
         print(f"Message:{message}", flush=True)
         time.sleep(2) 
         
-    success = False
-    if False
-        if response.status_code == 204:
-            logging.info("Message sent successfully!")
-            success = True
-        else:
-            print(f"Failed to send P: {response.status_code} - {response.text}", flush=True)
-            logging.info(f"Failed to send L: {response.status_code} - {response.text} ", flush=True)
-            if response.status_code == 429:
-                print(f"Remaining:{response.headers.get("X-RateLimit-Remaining")} \nReset_after: {response.headers.get("X-RateLimit-Reset-After")}", flush=True)
-                logging.info({
-                    "remaining": response.headers.get("X-RateLimit-Remaining"),
-                    "reset_after": response.headers.get("X-RateLimit-Reset-After"),
-                })
+    # success = False
+    # if False
+    #     if response.status_code == 204:
+    #         logging.info("Message sent successfully!")
+    #         success = True
+    #     else:
+    #         print(f"Failed to send P: {response.status_code} - {response.text}", flush=True)
+    #         logging.info(f"Failed to send L: {response.status_code} - {response.text} ", flush=True)
+    #         if response.status_code == 429:
+    #             print(f"Remaining:{response.headers.get("X-RateLimit-Remaining")} \nReset_after: {response.headers.get("X-RateLimit-Reset-After")}", flush=True)
+    #             logging.info({
+    #                 "remaining": response.headers.get("X-RateLimit-Remaining"),
+    #                 "reset_after": response.headers.get("X-RateLimit-Reset-After"),
+    #             })
+                
     message = "\n".join(lines)
     return {"content": message, "success":  success}
 
