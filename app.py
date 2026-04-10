@@ -149,7 +149,7 @@ def send_code_block(data):
         print(f"Message:{message}", flush=True)
         time.sleep(2) 
         
-    # success = False
+    success = False
     # if False
     #     if response.status_code == 204:
     #         logging.info("Message sent successfully!")
