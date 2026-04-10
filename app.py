@@ -145,7 +145,7 @@ def send_code_block(data):
         header = "📊 Inside Bars – Daily\n\n" if i == 0 else ""
         message = header + "```" + "\n".join(chunk) + "```"
         #response = discord_post(DISCORD_WEBHOOK, json={"content": message})
-        #response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+        response = requests.post(DISCORD_WEBHOOK, json={"content": message})
         print(f"Message:{message}", flush=True)
         time.sleep(2) 
         
