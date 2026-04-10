@@ -146,6 +146,7 @@ def send_code_block(data):
         message = header + "```" + "\n".join(chunk) + "```"
         #response = discord_post(DISCORD_WEBHOOK, json={"content": message})
         response = requests.post(DISCORD_WEBHOOK, json={"content": message})
+        print(f"ResponseCode: {response.status_code} - {response.text}", flush=True)
         print(f"Message:{message}", flush=True)
         time.sleep(2) 
         
